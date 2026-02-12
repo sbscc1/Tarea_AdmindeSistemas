@@ -243,7 +243,7 @@ function Ver-Clientes {
 
 do {
     Clear-Host
-    Write-Host "=== GESTOR DHCP WIN SERVER (V5 FINAL) ==="
+    Write-Host "=== GESTOR DHCP WIN SERVER ==="
     Write-Host "1. Instalar Rol + Firewall"
     Write-Host "2. Configurar Todo"
     Write-Host "3. Ver Estado"
@@ -258,4 +258,5 @@ do {
         "5" { Exit }
         default { Write-Host "Opcion invalida."; Start-Sleep 1 }
     }
+
 } while ($true)

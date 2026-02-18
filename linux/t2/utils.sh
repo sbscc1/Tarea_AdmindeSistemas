@@ -16,13 +16,11 @@ function validar_logica_red() {
     local i_fin=$(ip_a_int "$fin")
     local i_mask=$(ip_a_int "$mask")
 
-    # 1. Validar que Inicio sea MENOR que Fin
     if [ "$i_inicio" -ge "$i_fin" ]; then
         echo "ERROR LOGICO: La IP Inicial ($inicio) debe ser MENOR a la Final ($fin)." >&2
         return 1
     fi
 
-    # 2. Validar que esten en el MISMO SEGMENTO
     local red_inicio=$(( i_inicio & i_mask ))
     local red_fin=$(( i_fin & i_mask ))
 
@@ -35,7 +33,7 @@ function validar_logica_red() {
     return 0
 }
 
-# --- VALIDACIONES ---
+
 
 function es_ip_prohibida() {
     local ip=$1
@@ -64,7 +62,6 @@ function validar_formato_mascara() {
     return 1
 }
 
-# --- INTERACCION (AQUI ESTABA EL ERROR) ---
 
 function pedir_dato_ip() {
     local mensaje=$1
@@ -150,4 +147,40 @@ function pausa() {
     echo ""
     read -p "Presione Enter para continuar..."
     echo ""
+}
+
+
+function limpiar_dominio() {
+    local entrada=$1
+    # 1. Convertir a minúsculas
+    local limpio=$(echo "$entrada" | tr '[:upper:]' '[:lower:]')
+    # 2. Eliminar prefijo "www." si existe
+    limpio=${limpio#www.}
+    # 3. Validar formato (letras.letras)
+    if [[ ! "$limpio" =~ ^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}$ ]]; then
+        echo "error_formato"
+        return 1
+    fi
+    echo "$limpio"
+}
+
+function pedir_dominio() {
+    local valido=false
+    local input=""
+    local dominio_final=""
+
+    while [ "$valido" = false ]; do
+        read -p "Nombre del Dominio (ej. reprobados.com): " input
+        dominio_final=$(limpiar_dominio "$input")
+        
+        if [[ "$dominio_final" == "error_formato" ]]; then
+            echo "ERROR: Formato inválido. Use solo letras, números y puntos (ej. miempresa.com)." >&2
+        else
+            if [[ "$input" == *"www."* ]]; then
+                echo "ℹNota: Se eliminó el prefijo 'www.' para configurar la Zona Raíz." >&2
+            fi
+            valido=true
+            echo "$dominio_final"
+        fi
+    done
 }
